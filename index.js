@@ -1,4 +1,5 @@
 const express = require("express")
+const { param } = require("express/lib/request")
 const app = express()
 const port = 3000
 app.use(express.json())
@@ -40,16 +41,53 @@ app.post("/", (req, res) => {
 })
 
 // PUT : MODIFIER un utilisateur basé sur les données envoyées dans le corps(body) et le paramètre passé dans l'URL
-app.put("/", (req, res) => {
+app.put("/:id", (req, res) => {
+	// recuerer le ID envoier via le URL comme un param
+	const { id } = req.params
+
+	// récupérer toutes les données qui arrivent dans le corps de la requête (body)
+	const { firstName, lastName } = req.body
+
+	// on essai de trouver le utilisateur base sur son ID
+	const userIndex = users.findIndex((user) => user.id === parseInt(id))
+	// pas trouvé
+	if (userIndex < 0) {
+		return res.status(404).json({
+			msg: "on fait, il ne existe pas. User Id: " + id,
+		})
+	}
+	// verifier quelle son le donne envoier par l'utilisateur
+	if (firstName) users[userIndex].firstName = firstName
+	if (lastName) users[userIndex].lastName = lastName
+
 	res.json({
-		msg: "hello rest api ici le PUT ",
+		msg: "modifie !!!",
+		userModified: users[userIndex],
 	})
 })
 
 // DELETE : supprimer un utilisateur basé sur le paramètre passé dans l'URL
-app.delete("/", (req, res) => {
+app.delete("/:id", (req, res) => {
+	// recuerer le ID envoier via le URL comme un param
+	const { id } = req.params
+
+	// on essai de trouver le utilisateur base sur son ID
+	const userIndex = users.findIndex((user) => user.id === parseInt(id))
+	// pas trouvé
+	if (userIndex < 0) {
+		return res.status(404).json({
+			msg: "on fait, il ne existe pas. User Id: " + id,
+		})
+	}
+
+	// efface le utilisater de notre liste de utilisateurs
+	users.splice(userIndex, 1)
+
+	console.log(users);
+	
+
 	res.json({
-		msg: "hello rest api ici le DELETE ",
+		msg: "utilisateur efface !!!! Sin id: " + id,
 	})
 })
 
